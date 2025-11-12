@@ -1,0 +1,25 @@
+---
+- name: Deploy Dockerized Nginx web app
+  hosts: target_servers
+  become: true
+  tasks:
+    - name: Pull nginx image
+      docker_image:
+        name: nginx
+        source: pull
+
+    - name: Copy custom HTML file (optional)
+      copy:
+        src: files/index.html
+        dest: /home/ubuntu/index.html
+        mode: '0644'
+
+    - name: Run nginx container with custom page
+      docker_container:
+        name: web_app
+        image: nginx
+        ports:
+          - "80:80"
+        volumes:
+          - /home/ubuntu/index.html:/usr/share/nginx/html/index.html
+        state: started
